@@ -14,6 +14,7 @@ env:
   DOCKER_FILE_PATH: './Dockerfile'
 
 jobs:
+  if: github.event.pull_request.merged == true
   versioning_job:
     runs-on: ubuntu-latest
     outputs:
