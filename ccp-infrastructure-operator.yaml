@@ -1,10 +1,7 @@
 name: 🔄 Versioning & Deployment
-
-
 on:
   pull_request:
     types: [closed]
-
 env:
   DOCKERHUB_USER: "cuembybot"
   REPO_DEVOPS: "willmendezcuemby/ccp-devops"
@@ -15,10 +12,7 @@ env:
   DEPLOYMENT_PATCH_PATH: 'overlays/ccp-infrastructure-operator/dev'
   DISPATCH_COMMIT_MSG: 'Manual Dispatch to test the versioning action'
   DOCKER_FILE_PATH: './Dockerfile'
-
-
       
-
 jobs:
   versioning_job:
     if: github.event.pull_request.merged == true
@@ -28,7 +22,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Get commit message
         id: get_commit_message
         run: |
@@ -36,7 +29,6 @@ jobs:
           echo "Commit message: $commit_message"
           echo "commit_message=$commit_message" >> $GITHUB_ENV
           echo "::set-output name=commit_message::$commit_message"
-
       - name: Checkout devops repository
         uses: actions/checkout@v3
         with:
@@ -49,7 +41,7 @@ jobs:
         with:
           GH_TOKEN: ${{ secrets.DEVOPS_TOKEN }}
           EXTERNAL_REPO: ${{ env.REPO_GITOPS }}
-          EXTERNAL_REPO_FILE_PATH: ${{ env.GITOPS_FILE_PATH }}
+          EXTERNAL_REPO_FILE_PATH: $envs/ccp-infrastructure-operator/ccp-${{ github.event.pull_request.base.ref }}/version_info.json
           SOURCE_BRANCH: ${{ github.head_ref }}
           TARGET_BRANCH: ${{ github.base_ref }}
           COMMIT_MESSAGE: ${{ steps.get_commit_message.outputs.commit_message }}
@@ -128,7 +120,7 @@ jobs:
           organization_name: ${{ env.ORG_NAME }}
           external_repo: ${{ env.REPO_GITOPS }}
           metadata_path: envs/ccp-infrastructure-operator/ccp-${{ github.event.pull_request.base.ref }}/version_info.json
-          deployment_overlay_path: envs/ccp-infrastructure-operator/ccp-${{ github.event.pull_request.base.ref }}
+          deployment_overlay_path: ${{ env.DEPLOYMENT_PATCH_PATH }}
           gh_repo_name: ${{ github.event.repository.name }}
           release_branch_docker_alias: ${{ github.base_ref }}
 
